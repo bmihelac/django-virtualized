@@ -1,6 +1,4 @@
 {
-    "project_name": "coolname",
-    "dbname": "coolname",
-    "servername": "coolname"
+    "run_list": ["recipe[djangoapp::default]"]
 }
 
