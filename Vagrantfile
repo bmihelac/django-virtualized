@@ -1,14 +1,14 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
-require 'json'
+#require 'json'
 
 
 # Load node.json
-f = File.new 'node.json'
-s = f.read
-f.close
+#f = File.new 'node.json'
+#s = f.read
+#f.close
 
-j = JSON.load s
+#j = JSON.load s
 
 Vagrant::Config.run do |config|
   # All Vagrant configuration is done here. The most common configuration
@@ -44,11 +44,11 @@ Vagrant::Config.run do |config|
   # computers to access the VM, whereas host only networking does not.
   config.vm.forward_port 80, 8080
 
-  config.vm.provision :chef_solo do |chef|
-    chef.cookbooks_path = "deploy/cookbooks"
-    chef.add_recipe "djangoapp::default"
-    chef.json = j
-  end
+  #config.vm.provision :chef_solo do |chef|
+    #chef.cookbooks_path = "deploy/cookbooks"
+    #chef.add_recipe "djangoapp::default"
+    #chef.json = j
+  #end
 
 
   # Share an additional folder to the guest VM. The first argument is
