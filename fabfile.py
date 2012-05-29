@@ -8,19 +8,9 @@ env.roledefs = {
 
 
 env.project_name = "website"
-env.git_source = "git@github.com:bmihelac/django-new_project.git"
-env.git_branch = "demo"
-# dbsettings
-env.dbname = "django_new_demo"
-env.dbuser = "root"
-env.dbpass = ""
-# misc settings
-
 env.root_dir = '/home/vagrant/%s' % env.project_name
 env.virtualenv = '%s/env' % env.root_dir
 env.activate = 'source %s/bin/activate ' % env.virtualenv
-
-
 env.chef_executable = 'chef-solo'
 
 
@@ -92,7 +82,7 @@ def restart():
 def start_gunicorn():
     with cd(env.root_dir):
         with _virtualenv():
-            sudo('gunicorn website.wsgi:application -D')
+            sudo('gunicorn website.wsgi:application --daemon --pid gunicorn.pid')
 
 
 def install_requirements():
@@ -103,3 +93,14 @@ def install_requirements():
         with _virtualenv():
             run('pip install -r requirements.txt', pty=True)
 
+
+def bootstrap():
+    """
+    Bootstrap server.
+    """
+    provision()
+    pull()
+    create_virtualenv()
+    install_requirements()
+    nginx_symlink()
+    restart()
