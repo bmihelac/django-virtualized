@@ -63,7 +63,8 @@ def pull():
     """
     local('rsync -av -e "ssh -p %(port)s -i %(key_filename)s" website/ %(user)s@%(host)s:%(project_name)s/' % env)
 
-def nginx_symlink():
+def enable_website():
+    sudo("rm /etc/nginx/sites-enabled/default")
     sudo("ln -s ~/website/nginx/website.conf /etc/nginx/sites-enabled/website.conf")
 
 def restart():
@@ -78,6 +79,10 @@ def restart():
                 start_gunicorn()
             else:
                 sudo('kill -HUP %s' % pid)
+        restart_nginx()
+
+
+def restart_nginx():
     sudo('/etc/init.d/nginx restart')
 
 
@@ -103,9 +108,12 @@ def bootstrap():
     """
     Bootstrap server.
     """
+    install_chef()
     provision()
     pull()
     create_virtualenv()
     install_requirements()
-    nginx_symlink()
-    restart()
+    enable_website()
+    start_gunicorn()
+    restart_nginx()
+
