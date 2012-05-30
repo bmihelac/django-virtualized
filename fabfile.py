@@ -82,7 +82,10 @@ def restart():
 def start_gunicorn():
     with cd(env.root_dir):
         with _virtualenv():
-            sudo('gunicorn website.wsgi:application --daemon --pid gunicorn.pid')
+            # see https://de.twitter.com/pyfabric/status/115848459386503168
+            # gunicorn --daemon probably (?) creates a background process,
+            # still attached to your shell session
+            run('gunicorn website.wsgi:application --pid=gunicorn.pid & sleep 3')
 
 
 def install_requirements():
