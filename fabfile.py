@@ -1,14 +1,34 @@
+import os
+
 from fabric.api import cd, env, prefix, sudo, local, settings, run
 from contextlib import contextmanager
+import libcloud
+from libcloud.compute.types import Provider
+from libcloud.compute.providers import get_driver
+from libcloud.compute.base import NodeImage, NodeSize
+
+
+libcloud.security.VERIFY_SSL_CERT = False
 
 
 env.roledefs = {
     'vagrant': ['vagrant@127.0.0.1:2222'],
 }
+env.roledefs['ec2'] = []
 
 
 env.project_name = "website"
 env.chef_executable = 'chef-solo'
+
+
+#EC2 account settings
+EC2_ACCESS_ID = os.environ.get('EC2_ACCESS_ID', '')
+EC2_SECRET_KEY = os.environ.get('EC2_SECRET_KEY', '')
+EC2_KEYPATH = os.environ.get('EC2_KEYPATH', '')
+# EC2 instance AMI
+EC2_AMI = "ami-ac9943c5"
+# EC2 instance size
+EC2_INSTANCE_SIZE = "t1.micro"
 
 
 def _setup_env():
@@ -27,6 +47,12 @@ def vagrant():
     env.key_filename = result.split()[1]
     _setup_env()
 
+def ec2():
+    env.root_dir = '/home/ubuntu/%s' % env.project_name
+    env.key_filename = EC2_KEYPATH
+    basename = os.path.basename(EC2_KEYPATH)
+    env.ec2_keyname = os.path.splitext(basename)[0]
+    _setup_env()
 
 def create_virtualenv():
     with cd(env.root_dir):
@@ -117,3 +143,24 @@ def bootstrap():
     start_gunicorn()
     restart_nginx()
 
+def ec2_connection():
+    Driver = get_driver(Provider.EC2)
+    conn = Driver(EC2_ACCESS_ID, EC2_SECRET_KEY)
+    return conn
+
+def ec2_create_instance():
+    conn = ec2_connection()
+    image = NodeImage(id=EC2_AMI, name="", driver="")
+    size = NodeSize(
+            id=EC2_INSTANCE_SIZE,
+            name="", ram=None, disk=None, bandwidth=None, price=None, driver="")
+    instance_name = "test"
+    conn.create_node(name=instance_name, image=image, size=size,
+            ex_keyname=env.ec2_keyname)
+
+def ec2_list_instances():
+    conn = ec2_connection()
+    nodes = conn.list_nodes()
+    for node in nodes:
+        if node.public_ip:
+            print node.public_ip[0]
