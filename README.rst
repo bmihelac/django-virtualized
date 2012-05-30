@@ -38,15 +38,19 @@ http://localhost:8080
 EC2 instance
 ------------
 
-1. Setup EC2 environment variables::
+1. Setup EC2 environment variables
 
-   export EC2_ACCESS_ID="ec2-access-id"
-   export EC2_SECRET_KEY="ec2-secret-key"
-   export EC2_KEYPATH="~/ec2.pem"
+   ::
 
-2. Create EC2 instance::
+       export EC2_ACCESS_ID="ec2-access-id"
+       export EC2_SECRET_KEY="ec2-secret-key"
+       export EC2_KEYPATH="~/ec2.pem"
 
-   fab ec2 ec2_create_instance
+2. Create EC2 instance
+
+   ::
+
+       fab ec2 ec2_create_instance
 
 3. List EC2 instances::
 
@@ -58,7 +62,7 @@ EC2 instance
 
        fab --hosts=ubuntu@50.17.62.32 ec2 bootstrap
 
-    Replace IP with one that was listed with ec2_list_instances.
+   Replace IP with one that was listed with ec2_list_instances.
 
 About
 -----
