@@ -3,16 +3,17 @@ from contextlib import contextmanager
 
 
 env.roledefs = {
-    'vagrant': ['vagrant@127.0.0.1:2222']
+    'vagrant': ['vagrant@127.0.0.1:2222'],
 }
 
 
 env.project_name = "website"
-env.root_dir = '/home/vagrant/%s' % env.project_name
-env.virtualenv = '%s/env' % env.root_dir
-env.activate = 'source %s/bin/activate ' % env.virtualenv
 env.chef_executable = 'chef-solo'
 
+
+def _setup_env():
+    env.virtualenv = '%s/env' % env.root_dir
+    env.activate = 'source %s/bin/activate ' % env.virtualenv
 
 @contextmanager
 def _virtualenv():
@@ -21,9 +22,10 @@ def _virtualenv():
 
 
 def vagrant():
-    if env.user == 'vagrant':
-        result = local('vagrant ssh-config | grep IdentityFile', capture=True)
-        env.key_filename = result.split()[1]
+    env.root_dir = '/home/vagrant/%s' % env.project_name
+    result = local('vagrant ssh-config | grep IdentityFile', capture=True)
+    env.key_filename = result.split()[1]
+    _setup_env()
 
 
 def create_virtualenv():
